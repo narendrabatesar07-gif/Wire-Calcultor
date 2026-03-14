@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Wire Box Calculator</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#007bff">
+
+<style>
+
+body{
+font-family: Arial;
+background:#f4f4f4;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+}
+
+.calculator{
+background:white;
+padding:20px;
+width:380px;
+border-radius:10px;
+box-shadow:0 0 10px gray;
+}
+
+input,select,button{
+width:100%;
+padding:12px;
+margin:6px 0;
+font-size:16px;
+}
+
+button{
+background:#007bff;
+color:white;
+border:none;
+}
+
+.result{
+margin-top:10px;
+padding:10px;
+background:#e8f4e8;
+font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="calculator">
+
+<h2>Wire Box Calculator</h2>
+
+<select id="metal">
+<option value="copper">Copper</option>
+<option value="aluminium">Aluminium</option>
+</select>
+
+<input id="gage" placeholder="Gage">
+<input id="numWire" placeholder="No Wire">
+<input id="length" placeholder="Length">
+<input id="core" placeholder="Core">
+<input id="boxWeight" placeholder="Box Weight">
+<input id="ratePVC" placeholder="Rate PVC">
+<input id="rateCopper" placeholder="Rate Metal">
+<input id="sellPercentage" placeholder="Sell %">
+
+<button onclick="calculateValue()">Calculate</button>
+
+<button id="installBtn" style="display:none">
+Install App
+</button>
+
+<div class="result" id="result"></div>
+
+</div>
+
+<script>
+
+function calculateValue(){
+
+const metal=document.getElementById("metal").value;
+
+const gage=parseFloat(document.getElementById("gage").value);
+const numWire=parseFloat(document.getElementById("numWire").value);
+const length=parseFloat(document.getElementById("length").value);
+const core=parseFloat(document.getElementById("core").value);
+const boxWeight=parseFloat(document.getElementById("boxWeight").value);
+const ratePVC=parseFloat(document.getElementById("ratePVC").value);
+const rateCopper=parseFloat(document.getElementById("rateCopper").value);
+const sellPercentage=parseFloat(document.getElementById("sellPercentage").value);
+
+if(
+isNaN(gage)||isNaN(numWire)||isNaN(length)||
+isNaN(core)||isNaN(boxWeight)||
+isNaN(ratePVC)||isNaN(rateCopper)||
+isNaN(sellPercentage)
+){
+result.innerText="Fill all fields";
+return;
+}
+
+let constantValue;
+let metalName;
+
+if(metal==="copper"){
+constantValue=412;
+metalName="Copper";
+}else{
+constantValue=125;
+metalName="Aluminium";
+}
+
+const weightMetal=
+(gage*gage*constantValue*numWire*length*core*109.36)
+/10000000000;
+
+const weightPVC=boxWeight-weightMetal;
+
+const valueBox=
+(weightMetal*rateCopper)+
+(weightPVC*ratePVC);
+
+const sellPrice=
+valueBox+(valueBox*sellPercentage/100);
+
+result.innerHTML=
+`Weight of ${metalName}: ${weightMetal.toFixed(4)} kg<br>
+Weight of PVC: ${weightPVC.toFixed(4)} kg<br>
+Value: ₹${valueBox.toFixed(2)}<br>
+Final: ₹${sellPrice.toFixed(2)}`;
+
+}
+
+
+
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register('service-worker.js');
+}
+
+
+
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt",e=>{
+e.preventDefault();
+deferredPrompt=e;
+installBtn.style.display="block";
+});
+
+installBtn.addEventListener("click",()=>{
+deferredPrompt.prompt();
+});
+
+</script>
+
+</body>
+</html>
